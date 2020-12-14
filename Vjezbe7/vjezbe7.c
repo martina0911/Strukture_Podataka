@@ -1,5 +1,7 @@
-/* MENI OVO NE RADI I TRENUTNO NE ZNAM BOLJE, ALI POSTAVILA SAM DA VIDITE DA SAM U 
-PROCESU I KAD BUDEM MALO PAMETNIJA, ISPRAVIT CU KOD! */
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	MENI OVO NE RADI I TRENUTNO NE ZNAM BOLJE, ALI POSTAVILA SAM DA VIDITE DA SAM U 
+	PROCESU I KAD BUDEM MALO PAMETNIJA, ISPRAVIT CU KOD! 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 
 #define _CRT_SECURE_NO_WARNINGS
