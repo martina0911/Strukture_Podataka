@@ -159,11 +159,6 @@ int Operacije(int x, int y, int* rezultat, char operator)
 }
 int Ispis(Pozicija S)
 {
-	if (S == NULL)
-	{
-		printf("Stog je prazan!\n");
-		return -1;
-	}
 	while (S != NULL)
 	{
 		printf("%d\n", S->El);
