@@ -13,7 +13,6 @@ typedef struct _stog
 }Stog;
 
 int CitanjeDatoteke(char*, Pozicija);
-int NoviElement();
 int Push(int, Pozicija);
 int Pop(Pozicija);
 int Ispis(Pozicija);
