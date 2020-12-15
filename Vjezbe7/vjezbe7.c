@@ -60,11 +60,11 @@ int CitanjeDatoteke(char* buffer, Pozicija S)
 		
 		if (isdigit(buffer[i]))
 		{
-			sscanf(buffer, "%d", &x)
+			sscanf(buffer, "%d", &x);
 				Push(x, S);
 				printf(" (%d) ", x);
 		}
-		//Ako nije operann (broj) nego operator
+		//Ako nije operand (broj) nego operator
 		else
 		{
 			y = Pop(S);
