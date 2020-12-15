@@ -102,23 +102,25 @@ int Push(int x, Pozicija S) //unos na pocetak
 }
 int Pop(Pozicija S)
 {
+	int x;
+	Pozicija tmp = NULL;
+	tmp = (Pozicija)malloc(sizeof(Stog));
+
+	tmp = S->next;
+	x = tmp->El;
+	
+	if (tmp == NULL)
 	{
-		Pozicija tmp = NULL;
-		tmp = (Pozicija)malloc(sizeof(Stog));
-
-		tmp = S->next;
-
-		if (tmp == NULL)
-		{
-			printf("Stog je prazan!!\n\n");
-			return -1;
-		}
-
-		S->next = tmp->next;
-		printf("Brise se broj: %d", tmp->El);
-		free(tmp);
+		printf("Stog je prazan!!\n\n");
+		return -1;
 	}
-		return 0;
+
+	S->next = tmp->next;
+	printf("Brise se broj: %d", tmp->El);
+	free(tmp);
+	
+	}
+	return x;
 }
 int Operacije(int x, int y, int* rezultat, char operator)
 {
