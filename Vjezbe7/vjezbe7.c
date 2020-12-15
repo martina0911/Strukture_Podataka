@@ -69,7 +69,7 @@ int CitanjeDatoteke(char* buffer, Pozicija S)
 		{
 			y = Pop(S);
 			x = Pop(S);
-			Operacije(x, y, &rezultat, buffer[0]); //prvo se skida y sa stoga i ide desno, a drugi x!!!
+			Operacije(x, y, &rezultat, buffer[0]);
 			printf("\nRezultat ove operacije je: %d\n", rezultat);
 			Push(rezultat, S);
 		}
@@ -94,8 +94,6 @@ int Push(int x, Pozicija S) //unos na pocetak
 	q->next = S->next;
 	S->next = q;
 
-	printf("Upisan je broj %d.\n", q->El);
-
 	return 0;
 }
 int Pop(Pozicija S)
@@ -114,7 +112,7 @@ int Pop(Pozicija S)
 	}
 
 	S->next = tmp->next;
-	printf("Brise se broj: %d", tmp->El);
+
 	free(tmp);
 	
 	return x;
