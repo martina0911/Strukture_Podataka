@@ -1,14 +1,9 @@
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	MENI OVO NE RADI I TRENUTNO NE ZNAM BOLJE, ALI POSTAVILA SAM DA VIDITE DA SAM U 
-	PROCESU I KAD BUDEM MALO PAMETNIJA, ISPRAVIT CU KOD! 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-
-
 #define _CRT_SECURE_NO_WARNINGS
 
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<ctype.h>
 
 typedef struct _stog* Pozicija;
 typedef struct _stog
@@ -17,14 +12,12 @@ typedef struct _stog
 	Pozicija next;
 }Stog;
 
-int CitanjeDatoteke(char*);
+int CitanjeDatoteke(char*, Pozicija);
+int NoviElement();
 int Push(int, Pozicija);
 int Pop(Pozicija);
 int Ispis(Pozicija);
-int Zbroj(Pozicija);
-int Razlika(Pozicija);
-int Produkt(Pozicija);
-int Kolicnik(Pozicija);
+int Operacije (int, int, int*, char);
 
 int main()
 {
@@ -33,47 +26,25 @@ int main()
 	S->next = NULL;
 
 	char* buffer = NULL;
-	buffer = (char*)malloc(sizeof(char));
+	buffer = (char*)malloc(1000 * sizeof(char));
 	if (buffer == NULL)
 	{
 		printf("Greska u alokaciji!\n");
 		return -1;
 	}
 
-	CitanjeDatoteke(&buffer);
-
-	int i = 0;
-
-	while (buffer[i] != NULL)
-	{
-		if (buffer[i] >= '0' && buffer[i] <= '9')
-			Push(buffer[i], S);
-
-		else if (buffer[i] == '+')
-			Zbroj(S);
-
-		else if (buffer[i] == '-')
-			Razlika(S);
-
-		else if (buffer[i] = '*')
-			Produkt(S);
-
-		else if (buffer[i] = '/')
-			Kolicnik(S);
-
-		else if (buffer[i] == '(')
-			Pop(S);
-
-		i++;
-	}
+	CitanjeDatoteke(&buffer, S);
 
 	printf("\nIspis stoga:\n\n");
 	Ispis(S->next);
 
 	return 0;
 }
-int CitanjeDatoteke(char* brojac)
+int CitanjeDatoteke(char* buffer, Pozicija S)
 {
+	int i = 0;
+	int x, y;
+	int rezultat;
 	FILE* fp;
 	fp = fopen("Postfix.txt", "r");
 	if (fp == NULL)
@@ -81,12 +52,35 @@ int CitanjeDatoteke(char* brojac)
 		printf("Greska u otvaranju datoteke!\n");
 		return -1;
 	}
-
+	
 	while (!feof(fp))
 	{
-		fscanf(fp, "%s", *brojac);
+		fscanf(fp, "%s", buffer);
+		
+		//Provjera je li dani znak broj
+		
+		if (isdigit(buffer[i]))
+		{
+			sscanf(buffer, "%d", &x)
+				Push(x, S);
+				printf(" (%d) ", x);
+		}
+		//Ako nije operann (broj) nego operator
+		else
+		{
+			y = Pop(S);
+			x = Pop(S);
+			Operacije(x, y, &rezultat, buffer[i]); //prvo se skida y sa stoga i ide desno, a drugi x!!!
+			printf("Rezultat ove operacije je: %d\n", rezultat);
+			Push(rezultat, S);
+		}
+		
+		i++;
 	}
-
+	
+	fclose(fp);
+	free(buffer);
+	
 	return 0;
 }
 int Push(int x, Pozicija S) //unos na pocetak
@@ -127,51 +121,40 @@ int Pop(Pozicija S)
 	}
 		return 0;
 }
-int Zbroj(Pozicija S)
+int Operacije(int x, int y, int* rezultat, char operator)
 {
-	while (S->next->next != NULL)
-		S = S->next;
-
-	S->El = S->El + S->next->El;
-	S->next = NULL;
-
-	Push(S->El, S);
-
-	return 0;
-}
-int Razlika(Pozicija S)
-{
-	while (S->next->next != NULL)
-		S = S->next;
-
-	S->El = S->El - S->next->El;
-	S->next = NULL;
-
-	Push(S->El, S);
-
-	return 0;
-}
-int Produkt(Pozicija S)
-{
-	while (S->next->next != NULL)
-		S = S->next;
-
-	S->El = S->El * S->next->El;
-	S->next = NULL;
-
-	Push(S->El, S);
-
-	return 0;
-}
-int Kolicnik(Pozicija S)
-{
-	while (S->next->next != NULL)
-		S = S->next;
-
-	S->El = S->El / S->next->El;
-	S->next = NULL;
-
-	Push(S->El, S);
+	switch (operator)
+	{
+		case '+':
+		{
+			*rezultat = x + y;
+			break;
+		}
+		case '-':
+		{
+			*rezultat = x - y;
+			break;
+		}
+		case '*':
+		{
+			*rezultat = x * y;
+			break;
+		}
+		case '/':
+		{
+			if (y == 0)
+			{
+				printf("Dijeljenje nulom!\n");
+				return -1;
+			}
+				*rezultat = x / y;
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
 
 	return 0;
 }
