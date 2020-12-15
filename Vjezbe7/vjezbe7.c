@@ -34,7 +34,7 @@ int main()
 
 	CitanjeDatoteke(&buffer, S);
 
-	printf("\nIspis stoga:\n\n");
+	printf("\nKrajnji rezultat:\n\n");
 	Ispis(S->next);
 
 	return 0;
@@ -58,23 +58,21 @@ int CitanjeDatoteke(char* buffer, Pozicija S)
 		
 		//Provjera je li dani znak broj
 		
-		if (isdigit(buffer[i]))
+		if (isdigit(buffer[0]))
 		{
 			sscanf(buffer, "%d", &x);
 				Push(x, S);
-				printf(" (%d) ", x);
+				printf(" ~ %d ~ ", x);
 		}
 		//Ako nije operand (broj) nego operator
 		else
 		{
 			y = Pop(S);
 			x = Pop(S);
-			Operacije(x, y, &rezultat, buffer[i]); //prvo se skida y sa stoga i ide desno, a drugi x!!!
-			printf("Rezultat ove operacije je: %d\n", rezultat);
+			Operacije(x, y, &rezultat, buffer[0]); //prvo se skida y sa stoga i ide desno, a drugi x!!!
+			printf("\nRezultat ove operacije je: %d\n", rezultat);
 			Push(rezultat, S);
 		}
-		
-		i++;
 	}
 	
 	fclose(fp);
