@@ -119,7 +119,6 @@ int Pop(Pozicija S)
 	printf("Brise se broj: %d", tmp->El);
 	free(tmp);
 	
-	}
 	return x;
 }
 int Operacije(int x, int y, int* rezultat, char operator)
