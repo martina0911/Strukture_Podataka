@@ -1,172 +1,175 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define DATA_SIZE (11)
+#define DATA_SIZE 11
 
-struct _treeNode;
-typedef struct _treeNode* TreeNodePosition;
-typedef struct _treenode
+typedef struct Tree
 {
 	char data[DATA_SIZE];
-	TreeNodePosition left;
-	TreeNodePosition right;
-}TreeNode;
+	struct Tree* left;
+	struct Tree* right;
+}Tree;
 
-struct _listNode;
-typedef struct _listNode* ListNodePosition;
-typedef struct _listNode
+typedef struct List
 {
-	TreeNodePosition treeNode;
-	ListNodePosition next;
-}ListNode;
+	struct Tree* treeNode;
+	struct List* next;
+}List;
 
-TreeNodePosition create(char* data)
+Tree* Create(char* data)
 {
-	TreeNodePosition node = NULL;
-
-	node = (TreeNodePosition)malloc(sizeof(TreeNode));
-
-	if (NULL == node)
+	Tree* new = (Tree*) malloc(sizeof(Tree));
+	if(new == NULL)
 	{
-		printf("Greska u alokaciji!\n");
-		return NULL;
-	}
-
-	strcpy(node->data, data);
-	node->right = ;
-	node->left = ;
-
-	return node;
-}
-
-TreeNodePosition create(char* data);
-int pushFront(ListNodePosition head, TreeNodePosition treeNode);
-int pushBack(ListNodePosition head, TreeNodePosition treeNode);
-TreeNodePosition popFrong(ListNodePosition head);
-TreeNodePosition readFromFile(char* fileName);
-int IsNumber(char* data);
-
-int main(void)
-{
-
-
-
-	return 0;
-}
-
-int pushFront(ListNodePosition head, TreeNodePosition treeNode)
-{
-	ListNodePosition listNode = (ListNodePosition)malloc(sizeof(ListNode));
-
-	if (NULL == listNode)
-	{
-		printf("Greska u alokaciji!\n");
+		printf("Malloc failed!");
 		return -1;
-	}	
-
-	listNode->treeNode = treeNode;
-	listNode->next = head->next;
-	head->next = listNode;
-
-	return 0;
+	}
+	strcpy(new->data, data);
+	new->left = NULL;
+	new->right = NULL;
+	return new;
 }
 
-int pushBack(ListNodePosition head, TreeNodePosition treeNode)
+int PushFront(List* head, Tree* treeNode)
 {
-	ListNodePosition p = head;
-
-	while (p->next != NULL)
-		p = p->next;
-
-
-	return pushFront(p, treeNode);
+	List* position = (List*) malloc(sizeof(List));
+	if(position == NULL)
+	{
+		printf("Malloc failed!");
+		return -1;
+	}
+	position->treeNode = treeNode;
+	position->next = head->next;
+	head->next = position;
 }
 
-TreeNodePosition popFrong(ListNodePosition head)
+int PushBack(List* head, Tree* treeNode)
 {
-	ListNodePosition first = head->next;
-	TreeNodePosition result = NULL;
+	List* temp = head;
+	while(temp->next != NULL)
+	{
+		temp = temp->next;
+	}
+	return PushFront(temp, treeNode);
+}
 
-	if (NULL == first)
-		return NULL;
-
+Tree* PopFront(List* head)
+{
+	List* first = head->next;
+	Tree* result = NULL;
+	if(first == NULL)
+	{
+		return 0;
+	}
 	head->next = first->next;
 	result = first->treeNode;
 	free(first);
-
 	return result;
-}
-TreeNodePosition readFromFile(char* fileName)
-{
-	FILE* fp = NULL;
-	ListNode head ;
-	TreeNodePosition result;
-
-	fp = fopen(fileName, "r");
-
-	if (NULL == fp)
-	{
-		printf("Nije otvorena datoteka!\n");
-		return NULL;
-	}
-
-	while (!feof(fp))
-	{
-		TreeNodePosition node = NULL;
-		char data[DATA_SIZE] = { 0 };
-		fscanf(fp, "%s", data);
-
-		node = create(data);
-
-		if (NULL == node)
-		{
-			fclose(fp);
-			return NULL;
-		}
-
-		if (IsNumber(data))
-		{
-			pushFront(&head, node);
-
-		}
-
-		else
-		{
-			node->right = pushFront(&head);
-
-			if (NULL == node->right)
-			{
-				printf("Postfix writtenf in file %s isn't good!\n", fileName);
-				return NULL;
-			}
-			if (NULL == node->left)
-			{
-				printf("Postfix writtenf in file %s isn't good!\n", fileName);
-				return NULL;
-			}
-
-			pushFront(&head, node);
-		}
-	}
-
-	result = popFront(&head);
-
-	if (NULL == result)
-	{
-		printf("Postfix writtenf in file %s isn't good!\n", fileName);
-	}
-	if (popFornt(&head))
 }
 
 int IsNumber(char* data)
 {
 	int number = 0;
-
-	if (sscanf(data, "%d", &number) == 1)
+	if(sscanf(data, " %d", & number) == 1)
+	{
 		return 1;
+	}
+	return 0;
+}
 
+Tree* ReadFromFile(char* filename)
+{
+	FILE* data = fopen(filename, "r");
+	List head;
+	head.next = NULL;
+	Tree* result = NULL;
+	char character[DATA_SIZE] = { 0 };
+	if(data == NULL)
+	{
+		printf("\nDatoteka ne postoji!");
+		return 0;
+	}
+	else
+	{
+		while(feof(data) != 1)
+		{
+			Tree* node = NULL;
+			node = Create(character);
+			if(node == NULL)
+			{
+				fclose(data);
+				return 0;
+			}
+			fscanf(data, "%s", & character);
+			if(IsNumber(character) != 0)
+			{
+				PushFront(& head, node);
+			}
+			else
+			{
+				PopFront(& head);
+				if(node == NULL)
+				{
+					printf("\nKrivi postfix zapis! 04");
+					return 0;
+				}
+				node->left = PopFront(& head);
+				if(node->left == NULL)
+				{
+					printf("\nKrivi postfix zapis! 03");
+					return 0;
+				}
+				PushFront(& head, node);
+			}
+		}
+	}
+	result = PopFront(&head);
+	if(result == NULL)
+	{
+		printf("\nKrivi postfix zapis! 01");
+	}
+	if (PopFront(& head) != NULL)
+	{
+		printf("\nKrivi postfix zapis! 02");
+	}
+	else
+	{
+		return result;
+	}
+}
+
+void PrintInOrder(List* head, Tree* current)
+{
+	if(current == NULL)
+	{
+		return;
+	}
+	PrintInOrder(head, current->left);
+	PushBack(head, current);
+	PrintInOrder(head, current->right);
+}
+
+int main()
+{
+	char filename[1024] = { 0 };
+	printf("Unesite ime datoteke: ");
+	scanf(" %s", filename);
+	Tree* test = ReadFromFile(filename);
+	if(test == NULL)
+	{
+		return 1;
+	}
+	List head;
+	head.next = NULL;
+	PrintInOrder(& head, test);
+	List* p;
+	for(p = head.next, p != NULL; p = p->next;)
+	{
+		printf("%d");
+	}
+;
 	return 0;
 }
