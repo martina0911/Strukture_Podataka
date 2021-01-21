@@ -1,175 +1,224 @@
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-#define DATA_SIZE 11
+#define VEL 11
+#define MAX_DAT 1024
 
-typedef struct Tree
+struct cvorStabla;
+typedef struct cvorStabla *Stablo;
+struct Stog;
+typedef struct Stog *Pozicija;
+
+struct cvorStabla
 {
-	char data[DATA_SIZE];
-	struct Tree* left;
-	struct Tree* right;
-}Tree;
+	char El[VEL];
+	Stablo Left;
+	Stablo Right;
+};
 
-typedef struct List
+struct Stog
 {
-	struct Tree* treeNode;
-	struct List* next;
-}List;
+	Stablo El;
+	Pozicija Next;
+};
 
-Tree* Create(char* data)
-{
-	Tree* new = (Tree*) malloc(sizeof(Tree));
-	if(new == NULL)
-	{
-		printf("Malloc failed!");
-		return -1;
-	}
-	strcpy(new->data, data);
-	new->left = NULL;
-	new->right = NULL;
-	return new;
-}
-
-int PushFront(List* head, Tree* treeNode)
-{
-	List* position = (List*) malloc(sizeof(List));
-	if(position == NULL)
-	{
-		printf("Malloc failed!");
-		return -1;
-	}
-	position->treeNode = treeNode;
-	position->next = head->next;
-	head->next = position;
-}
-
-int PushBack(List* head, Tree* treeNode)
-{
-	List* temp = head;
-	while(temp->next != NULL)
-	{
-		temp = temp->next;
-	}
-	return PushFront(temp, treeNode);
-}
-
-Tree* PopFront(List* head)
-{
-	List* first = head->next;
-	Tree* result = NULL;
-	if(first == NULL)
-	{
-		return 0;
-	}
-	head->next = first->next;
-	result = first->treeNode;
-	free(first);
-	return result;
-}
-
-int IsNumber(char* data)
-{
-	int number = 0;
-	if(sscanf(data, " %d", & number) == 1)
-	{
-		return 1;
-	}
-	return 0;
-}
-
-Tree* ReadFromFile(char* filename)
-{
-	FILE* data = fopen(filename, "r");
-	List head;
-	head.next = NULL;
-	Tree* result = NULL;
-	char character[DATA_SIZE] = { 0 };
-	if(data == NULL)
-	{
-		printf("\nDatoteka ne postoji!");
-		return 0;
-	}
-	else
-	{
-		while(feof(data) != 1)
-		{
-			Tree* node = NULL;
-			node = Create(character);
-			if(node == NULL)
-			{
-				fclose(data);
-				return 0;
-			}
-			fscanf(data, "%s", & character);
-			if(IsNumber(character) != 0)
-			{
-				PushFront(& head, node);
-			}
-			else
-			{
-				PopFront(& head);
-				if(node == NULL)
-				{
-					printf("\nKrivi postfix zapis! 04");
-					return 0;
-				}
-				node->left = PopFront(& head);
-				if(node->left == NULL)
-				{
-					printf("\nKrivi postfix zapis! 03");
-					return 0;
-				}
-				PushFront(& head, node);
-			}
-		}
-	}
-	result = PopFront(&head);
-	if(result == NULL)
-	{
-		printf("\nKrivi postfix zapis! 01");
-	}
-	if (PopFront(& head) != NULL)
-	{
-		printf("\nKrivi postfix zapis! 02");
-	}
-	else
-	{
-		return result;
-	}
-}
-
-void PrintInOrder(List* head, Tree* current)
-{
-	if(current == NULL)
-	{
-		return;
-	}
-	PrintInOrder(head, current->left);
-	PushBack(head, current);
-	PrintInOrder(head, current->right);
-}
+Stablo Citanje_Postfixa(char*, Stablo);
+Stablo Stvori_Stablo(char*);
+int Push(Stablo, Pozicija);
+Pozicija Stvori_Stog(Stablo);
+Stablo Pop(Pozicija);
+int Upis_Infixa(char*, Stablo);
 
 int main()
 {
-	char filename[1024] = { 0 };
-	printf("Unesite ime datoteke: ");
-	scanf(" %s", filename);
-	Tree* test = ReadFromFile(filename);
-	if(test == NULL)
+	Stablo root = NULL;
+	char dat[MAX_DAT] = { 0 };
+
+	printf("Unesite ime datoteke iz koje zelite ucitati postfix izraz:\t");
+	scanf(" %s", dat);
+
+	root = Citanje_Postfixa(dat, root);
+
+	if (!root)
+		return NULL;
+
+	printf("Unesite ime datoteke u koju zelite upisati infix izraz:\t\t");
+	scanf(" %s", dat);
+
+	Upis_Infixa(dat, root);
+
+	return 0;
+}
+
+Stablo Citanje_Postfixa(char* dat, Stablo S)
+{
+	FILE *fp = NULL;
+	char buffer[VEL] = { 0 };
+	struct Stog head;
+	Stablo rezultat = NULL;
+
+	head.Next = NULL;
+
+	fp = fopen(dat, "r");
+
+	if (!fp)
 	{
-		return 1;
+		printf("Datoteka ne postoji!\r\n");
+		return NULL;
 	}
-	List head;
-	head.next = NULL;
-	PrintInOrder(& head, test);
-	List* p;
-	for(p = head.next, p != NULL; p = p->next;)
+
+	while (!feof(fp))
 	{
-		printf("%d");
+		Stablo cvor = NULL;
+
+		fscanf(fp, " %s", buffer);
+		cvor = Stvori_Stablo(buffer);
+
+		if (!cvor)
+		{
+			fclose(fp);
+			return NULL;
+		}
+
+		if (atoi(cvor->El))
+			Push(cvor, &head);
+		else
+		{
+			cvor->Right = Pop(&head);
+
+			if (!cvor->Right)
+			{
+				printf("Postfix izraz nije tocan!\r\n");
+				return NULL;
+			}
+
+			cvor->Left = Pop(&head);
+
+			if (!cvor->Left)
+			{
+				printf("Postfix izraz nije tocan!\r\n");
+				return NULL;
+			}
+
+			Push(cvor, &head);
+		}
+
 	}
-;
+
+	rezultat = Pop(&head);
+
+	if (!rezultat)
+	{
+		printf("Datoteka je prazna!\r\n");
+		return NULL;
+	}
+
+	return rezultat;
+}
+
+Stablo Stvori_Stablo(char* buffer)
+{
+	Stablo S = NULL;
+
+	S = (Stablo)malloc(sizeof(struct cvorStabla));
+
+	if (!S)
+	{
+		printf("Alokacija stabla nije uspjela!\r\n");
+		return NULL;
+	}
+
+	strcpy(S->El, buffer);
+	S->Left = NULL;
+	S->Right = NULL;
+
+}
+
+int Push(Stablo S, Pozicija P)
+{
+	Pozicija Q = NULL;
+
+	Q = Stvori_Stog(S);
+
+	if (!Q)
+		return -1;
+
+	Q->Next = P->Next;
+	P->Next = Q;
+
+	return 0;
+}
+
+Pozicija Stvori_Stog(Stablo S)
+{
+	Pozicija P = NULL;
+
+	P = (Pozicija)malloc(sizeof(struct Stog));
+
+	if (!P)
+	{
+		printf("Alokacija stoga nije uspjela!\r\n");
+		return NULL;
+	}
+
+	P->El = S;
+	P->Next = NULL;
+
+	return P;
+}
+
+Stablo Pop(Pozicija P)
+{
+	Pozicija temp = NULL;
+	Stablo rezultat = NULL;
+
+	if (P->Next == NULL)
+		return NULL;
+
+	temp = P->Next;
+	rezultat = temp->El;
+	P->Next = temp->Next;
+	free(temp);
+
+	return rezultat;
+}
+
+int Upis_Infixa(char* dat, Stablo S)
+{
+	FILE *fp = NULL;
+
+	fp = fopen(dat, "a");
+
+	if (!fp)
+	{
+		printf("Greska pri otvaranju datoteke!\r\n");
+		return NULL;
+	}
+
+	if (S->Left != NULL)
+	{
+		fprintf(fp, "(");
+		fclose(fp);
+
+		Upis_Infixa(dat, S->Left);
+
+		fp = fopen(dat, "a");
+		fprintf(fp, " %s ", S->El);
+		fclose(fp);
+
+		Upis_Infixa(dat, S->Right);
+
+		fp = fopen(dat, "a");
+		fprintf(fp, ")");
+
+	}
+	else
+		fprintf(fp, "%s", S->El);
+
+
+	fclose(fp);
+
 	return 0;
 }
