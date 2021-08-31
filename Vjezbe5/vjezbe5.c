@@ -118,7 +118,7 @@ int Unija(pozicija L1, pozicija L2, pozicija U)
 		q = (pozicija)malloc(sizeof(Lista));
 		if (q == NULL)
 		{
-			printf("Greska u alokaciji!\n\}");
+			printf("Greska u alokaciji!\n");
 			return -1;
 		}
 		if (L1->El == L2->El)
