@@ -108,7 +108,7 @@ Pozicija Insert(Pozicija P, int n)
 	return P;
 }
 
-void Print(Pozicija P)
+void Print(Pozicija P) // INORDER ISPIS
 {
 	if (P != NULL)
 	{
@@ -162,13 +162,13 @@ Pozicija Delete(Pozicija P, int n)
 		P->Right = Delete(P->Right, n);
 	else
 	{
-		if (P->Left != NULL && P->Right != NULL)
+		if (P->Left != NULL && P->Right != NULL) // ako ima i lijevo i desno dijete
 		{
 			//trazimo najveci element u lijevom podstablu ili najmanji u desnom
 			tmp = FindMin(P->Right);
 			P->El = tmp->El;
 			P->Right = Delete(P->Right, tmp->El);
-			/*tmp = FindMax(P->Left); tr
+			/*tmp = FindMax(P->Left); 
 			P->El = tmp->El;
 			P->Left = Delete(P->Left, tmp->El);*/
 			
@@ -176,9 +176,9 @@ Pozicija Delete(Pozicija P, int n)
 		else
 		{
 			tmp = P;
-			if (P->Left == NULL)
+			if (P->Left == NULL) //ako je lijevo dijete == NULL
 				P = P->Right;
-			else
+			else //ako je desno dijete == NULL
 				P = P->Left;
 			free(tmp);
 		}
